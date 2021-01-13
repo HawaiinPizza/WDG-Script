@@ -15,8 +15,13 @@ def findwdg(catalog)->(dict):
     
 # thread = findwdg()
 
-# data=requests.get("https://a.4cdn.org/g/catalog.json")
 # res=findwdg(data)
+
+# data=requests.get("https://a.4cdn.org/g/catalog.json")
+# res = findwdg(data)
+# with open("DATA", "wb") as f:
+#     pickle.dump(res, f)
+
 res = []
 with open("DATA", "rb") as f:
     res = pickle.load(f)
@@ -42,9 +47,9 @@ class MyHTMLParser(HTMLParser):
 p = MyHTMLParser()
 
 def parsepost(post):
-    regex = re.compile("title:.*|progress:.*")
+    regex = re.compile("title:.*\n|progress:.*\n")
     if(regex.search(post)!=None):
-        print(regex.search(post))
+        print("FOUND CORRECT ONE!")
         print(post)
         # print(post)
 
@@ -55,3 +60,8 @@ for i in res.json()["posts"]:
     p.feed(i["com"])
     parsepost(p.pop())
     p.close()
+
+
+
+# README IF THIS ISNT WORKING
+# You might not have DATA file. Check the pastpin link shown here 
