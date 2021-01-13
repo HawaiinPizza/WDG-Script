@@ -1,6 +1,8 @@
 import requests
 import pickle
 import re
+import sqlite3
+
 # Thank god this comes incldued wtih python.
 from html.parser import HTMLParser
 def findwdg(catalog)->(dict):
@@ -49,16 +51,34 @@ p = MyHTMLParser()
 def parsepost(post):
     regex = re.compile("title:.*\n|progress:.*\n")
     if(regex.search(post)!=None):
-        print("FOUND CORRECT ONE!")
-        print(post)
-        # print(post)
+        # print(regex.findall(post))
+        keywords = ["title", "dev", "tools", "link", "repo", "progress"]
+        regexstring=''.join(map(lambda i: i+":.*\\n|", keywords))
+        regexstring = regexstring[0:-3]
+        # print(regexstring)
+        regex2 = re.compile(regexstring)
+        flags=(regex2.findall(post))
+        ans = {}
+        for flag in flags:
+            (column, data) = flag.split(":", 1)
+            ans[column]=data.replace("\n", "")
+        return ans
+    return None
 
+
+        
 # p.feed(testme["com"])
 # parsepost(p.data,True)
 
+conn = sqlite3.connect("example.db")
+c = conn.cursor()
+def insertvalue(entry):
+    pass
 for i in res.json()["posts"]:
     p.feed(i["com"])
-    parsepost(p.pop())
+    parsedpost=parsepost(p.pop())
+    if(parsedpost!=None):
+        insertvalue(parsedpost)
     p.close()
 
 
