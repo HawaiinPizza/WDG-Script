@@ -1,12 +1,12 @@
 import requests
 import pickle
 import re
-import sqlite3
-
+import db
 # Thank god this comes incldued wtih python.
 from html.parser import HTMLParser
-def findwdg(catalog)->(dict):
+def findwdg()->(dict):
     """ Returns the replies of a thread with wdg in it"""
+    catalog=requests.get("https://a.4cdn.org/g/catalog.json")
     for page in catalog.json():
         for thread in page["threads"]:
             if("sub" in thread):
@@ -14,7 +14,7 @@ def findwdg(catalog)->(dict):
                     threadnum = thread["no"]
                     return (requests.get(f"https://a.4cdn.org/g/thread/{threadnum}.json"))
 
-    
+
 # thread = findwdg()
 
 # res=findwdg(data)
@@ -24,13 +24,6 @@ def findwdg(catalog)->(dict):
 # with open("DATA", "wb") as f:
 #     pickle.dump(res, f)
 
-res = []
-with open("DATA", "rb") as f:
-    res = pickle.load(f)
-
-
-
-testme = res.json()["posts"][-1]
 
 class MyHTMLParser(HTMLParser):
     """Get the html from any posts that DOES have title: and progress:, and returns the acutal text"""
@@ -46,14 +39,14 @@ class MyHTMLParser(HTMLParser):
         tmp = self.data
         self.data=""
         return tmp
-p = MyHTMLParser()
 
 def parsepost(post):
+    """ Given a post, try to parse out the relevant columsn, as listed below """
     regex = re.compile("title:.*\n|progress:.*\n")
     if(regex.search(post)!=None):
         # print(regex.findall(post))
-        keywords = ["title", "dev", "tools", "link", "repo", "progress"]
-        regexstring=''.join(map(lambda i: i+":.*\\n|", keywords))
+
+        regexstring=''.join(map(lambda i: i+":.*\\n|", db.columns))
         regexstring = regexstring[0:-3]
         # print(regexstring)
         regex2 = re.compile(regexstring)
@@ -66,22 +59,24 @@ def parsepost(post):
     return None
 
 
-        
-# p.feed(testme["com"])
-# parsepost(p.data,True)
-
-conn = sqlite3.connect("example.db")
-c = conn.cursor()
-def insertvalue(entry):
-    pass
-for i in res.json()["posts"]:
-    p.feed(i["com"])
-    parsedpost=parsepost(p.pop())
-    if(parsedpost!=None):
-        insertvalue(parsedpost)
-    p.close()
 
 
-
-# README IF THIS ISNT WORKING
-# You might not have DATA file. Check the pastpin link shown here 
+def main():
+    """
+    For testing
+    res = []
+    with open("DATA", "rb") as f:
+        res = pickle.load(f)
+    testme = res.json()["posts"][-1]
+    """
+    wdgPosts = findwdg()
+    p = MyHTMLParser()
+    for i in wdgPosts.json()["posts"]:
+        p.feed(i["com"])
+        parsedpost=parsepost(p.pop())
+        if(parsedpost!=None):
+            db.init()
+            db.insertentry(parsedpost)
+        p.close()
+    list(map(lambda i:print(i), db.getall()))
+main()
