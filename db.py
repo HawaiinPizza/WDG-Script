@@ -3,7 +3,7 @@ conn = sqlite3.connect(":memory:")
 c = conn.cursor()
 
 table="projects"
-columns = ["title", "dev", "tools", "link", "repo", "progress"]
+columns = ["title", "dev", "tools", "link", "repo", "progress", "image"]
 def init():
     # I didn't know what to call the santize string for SQL commands,
     # so it's columnsSQL. :( sorry if tha'ts cringe 

@@ -38,7 +38,8 @@ def parsepost(post):
     if(regex.search(post)!=None):
         # print(regex.findall(post))
 
-        regexstring=''.join(map(lambda i: i+":.*\\n|", db.columns))
+        #The reason we don't want the last column is it's image, which we will get in a different way.
+        regexstring=''.join(map(lambda i: i+":.*\\n|", db.columns[0:-2]))
         regexstring = regexstring[0:-3]
         # print(regexstring)
         regex2 = re.compile(regexstring)
@@ -69,7 +70,9 @@ def main():
         p.feed(i["com"])
         parsedpost=parsepost(p.pop())
         if(parsedpost!=None):
-            print(parsedpost)
+            if(i.get("tim") != None):
+                parsedpost["image"] = "https://i.4cdn.org/g/"+str(i["tim"])+i["ext"]
+            # parsedpost["image"] = pars
             db.insertentry(parsedpost)
         p.close()
     list(map(lambda i:print(i), db.getall()))
