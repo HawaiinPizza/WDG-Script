@@ -59,14 +59,17 @@ def main():
     finds any wdg generals, and if it detects any post that has the format
     of
     keyword1: data1,
-    keyword2: data2, etc, it will be parsed and added here"""
+    keyword2: data2, etc, it will be parsed and added here
+    the function below is mostly for showcasing it.
+    """
     wdgPosts = findwdg()
     p = MyHTMLParser()
+    db.init()
     for i in wdgPosts.json()["posts"]:
         p.feed(i["com"])
         parsedpost=parsepost(p.pop())
         if(parsedpost!=None):
-            db.init()
+            print(parsedpost)
             db.insertentry(parsedpost)
         p.close()
     list(map(lambda i:print(i), db.getall()))
