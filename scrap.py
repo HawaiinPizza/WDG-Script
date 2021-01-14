@@ -15,14 +15,6 @@ def findwdg()->(dict):
                     return (requests.get(f"https://a.4cdn.org/g/thread/{threadnum}.json"))
 
 
-# thread = findwdg()
-
-# res=findwdg(data)
-
-# data=requests.get("https://a.4cdn.org/g/catalog.json")
-# res = findwdg(data)
-# with open("DATA", "wb") as f:
-#     pickle.dump(res, f)
 
 
 class MyHTMLParser(HTMLParser):
@@ -62,13 +54,12 @@ def parsepost(post):
 
 
 def main():
-    """
-    For testing
-    res = []
-    with open("DATA", "rb") as f:
-        res = pickle.load(f)
-    testme = res.json()["posts"][-1]
-    """
+    """ The main function, mostly because I'm a shit python dev and my files
+    can get REALLY CLUTTERED. What this script does is parse through /g/, 
+    finds any wdg generals, and if it detects any post that has the format
+    of
+    keyword1: data1,
+    keyword2: data2, etc, it will be parsed and added here"""
     wdgPosts = findwdg()
     p = MyHTMLParser()
     for i in wdgPosts.json()["posts"]:
