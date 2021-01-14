@@ -34,12 +34,12 @@ class MyHTMLParser(HTMLParser):
 
 def parsepost(post):
     """ Given a post, try to parse out the relevant columsn, as listed below """
-    regex = re.compile("title:.*\n|progress:.*\n")
+    regex = re.compile("(title:..*(.|\n)*progress:..*)|(progress:..*(.|\n)*title:..*)")
     if(regex.search(post)!=None):
         # print(regex.findall(post))
 
         #The reason we don't want the last column is it's image, which we will get in a different way.
-        regexstring=''.join(map(lambda i: i+":.*\\n|", db.columns[0:-2]))
+        regexstring=''.join(map(lambda i: i+":.*\\n|", db.columns[0:-1]))
         regexstring = regexstring[0:-3]
         # print(regexstring)
         regex2 = re.compile(regexstring)
@@ -66,6 +66,7 @@ def main():
     wdgPosts = findwdg()
     p = MyHTMLParser()
     db.init()
+    testme=True
     for i in wdgPosts.json()["posts"]:
         p.feed(i["com"])
         parsedpost=parsepost(p.pop())
@@ -73,7 +74,13 @@ def main():
             if(i.get("tim") != None):
                 parsedpost["image"] = "https://i.4cdn.org/g/"+str(i["tim"])+i["ext"]
             # parsedpost["image"] = pars
+            if(testme):
+                parsedpost["progress"]="; drop table projects; --"
+                testme=False
+            
             db.insertentry(parsedpost)
         p.close()
-    list(map(lambda i:print(i), db.getall()))
+    import pprint
+    p = pprint.PrettyPrinter()
+    list(map(lambda i:p.pprint(i), db.getall()))
 main()
